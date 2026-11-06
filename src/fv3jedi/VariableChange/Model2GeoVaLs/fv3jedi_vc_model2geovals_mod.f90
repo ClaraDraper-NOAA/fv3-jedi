@@ -118,6 +118,10 @@ logical :: have_qsat, have_rh
 real(kind=kind_real), allocatable :: rh    (:,:,:)         !Relative humidity
 real(kind=kind_real), allocatable :: qsat   (:,:,:)        !Saturation specific humidity
 
+! 2m saturation specific humidity
+logical :: have_qsat2m
+real(kind=kind_real), allocatable :: t2m_sat(:,:,:), q2m_sat(:,:,:), qsat2m(:,:,:)
+
 ! Pressure fields
 logical :: have_pressures
 real(kind=kind_real), allocatable :: ps    (:,:,:)         !Surface pressure
@@ -392,6 +396,18 @@ elseif (have_t .and. have_pressures .and. have_q) then
   allocate(qsat(self%isc:self%iec,self%jsc:self%jec,self%npz))
   call get_qsat(geom,delp,t,q,qsat)
   have_qsat = .true.
+endif
+
+! 2m saturation specific humidity
+! -------------------------------
+have_qsat2m = .false.
+if (have_pressures .and. xm%has_field('air_temperature_at_2m') .and. &
+    xm%has_field('water_vapor_mixing_ratio_wrt_moist_air_at_2m')) then
+  call xm%get_field('air_temperature_at_2m', t2m_sat)
+  call xm%get_field('water_vapor_mixing_ratio_wrt_moist_air_at_2m', q2m_sat)
+  allocate(qsat2m(self%isc:self%iec,self%jsc:self%jec,1))
+  call get_qsat_at_2m(geom,t2m_sat,q2m_sat,ps,qsat2m)
+  have_qsat2m = .true.
 endif
 
 ! Relative humidity
@@ -1013,6 +1029,11 @@ do f = 1, size(fields_to_do)
     if (.not. have_q) call field_fail(fields_to_do(f))
     field_ptr = q
 
+  case ('saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m')
+
+    if (.not. have_qsat2m) call field_fail(fields_to_do(f))
+    field_ptr = qsat2m
+
   case ('saturation_water_vapor_mixing_ratio_wrt_moist_air')
 
     if (.not. have_qsat) call field_fail(fields_to_do(f))
@@ -1347,6 +1368,9 @@ if (allocated(vd)) deallocate(vd)
 if (allocated(fields_to_do)) deallocate(fields_to_do)
 if (allocated(q)) deallocate(q)
 if (allocated(qsat)) deallocate(qsat)
+if (allocated(qsat2m)) deallocate(qsat2m)
+if (allocated(t2m_sat)) deallocate(t2m_sat)
+if (allocated(q2m_sat)) deallocate(q2m_sat)
 if (allocated(rh)) deallocate(rh)
 if (allocated(t)) deallocate(t)
 if (allocated(tv)) deallocate(tv)

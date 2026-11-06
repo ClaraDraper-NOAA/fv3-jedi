@@ -24,6 +24,7 @@ public q_to_rh
 public q_to_rh_tl
 public q_to_rh_ad
 public get_qsat
+public get_qsat_at_2m
 public q4_to_q2
 public q2_to_q4
 
@@ -371,6 +372,52 @@ subroutine get_qsat(geom,delp,t,q,qsat)
   deallocate(pe)
 
 end subroutine get_qsat
+
+!----------------------------------------------------------------------------
+
+subroutine get_qsat_at_2m(geom,t2m,q2m,ps,qsat2m)
+
+  ! Saturation specific humidity at 2m, using the same table and formula as qsmith,
+  ! with 2m temperature and humidity, and surface pressure.
+
+  implicit none
+  type(fv3jedi_geom),   intent(in)  :: geom
+  real(kind=kind_real), intent(in)  ::    t2m(geom%isc:geom%iec,geom%jsc:geom%jec,1)
+  real(kind=kind_real), intent(in)  ::    q2m(geom%isc:geom%iec,geom%jsc:geom%jec,1)
+  real(kind=kind_real), intent(in)  ::     ps(geom%isc:geom%iec,geom%jsc:geom%jec,1)
+  real(kind=kind_real), intent(out) :: qsat2m(geom%isc:geom%iec,geom%jsc:geom%jec,1)
+
+  real(kind_real), parameter :: esl = 0.621971831
+  integer, parameter :: length=2621
+  real(kind_real), allocatable :: table(:), des(:)
+  real(kind_real) :: es, tice, zvir, ap1
+  integer :: i, j, k, it
+
+  tice = constant('tice')
+  zvir = constant('zvir')
+
+  allocate ( table(length) )
+  call qs_table(length,table)
+
+  allocate ( des(length) )
+  do k=1,length-1
+    des(k) = table(k+1) - table(k)
+  enddo
+  des(length) = des(length-1)
+
+  do j = geom%jsc,geom%jec
+    do i = geom%isc,geom%iec
+      ap1 = 10.0_kind_real*dim(t2m(i,j,1), tice-160.0_kind_real) + 1.0_kind_real
+      ap1 = min(2621.0_kind_real, ap1)
+      it = int(ap1)
+      es = table(it) + (ap1-it)*des(it)
+      qsat2m(i,j,1) = esl*es*(1.0_kind_real+zvir*q2m(i,j,1))/ps(i,j,1)
+    enddo
+  enddo
+
+  deallocate(table,des)
+
+end subroutine get_qsat_at_2m
 
 !----------------------------------------------------------------------------
 

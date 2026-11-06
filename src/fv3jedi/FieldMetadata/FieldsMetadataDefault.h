@@ -835,7 +835,15 @@ namespace fv3jedi {
     md.space = "magnitude";
     addFieldMetadata(fieldsmetadata, nlev, md);
 
-    md.longName = "specfic_humidity_at_2m";
+    md.longName = "saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m";
+    md.units = "kg/kg";
+    md.kind = "double";
+    md.tracer = "false";
+    md.levels = "1";
+    md.space = "magnitude";
+    addFieldMetadata(fieldsmetadata, nlev, md);
+
+    md.longName = "water_vapor_mixing_ratio_wrt_moist_air_at_2m";
     md.units = "kg/kg";
     md.kind = "double";
     md.tracer = "false";
