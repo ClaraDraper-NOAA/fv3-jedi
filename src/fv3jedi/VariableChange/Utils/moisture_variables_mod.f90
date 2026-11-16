@@ -24,6 +24,7 @@ public q_to_rh
 public q_to_rh_tl
 public q_to_rh_ad
 public get_qsat
+public get_qsat_at_2m
 public q4_to_q2
 public q2_to_q4
 
@@ -365,7 +366,7 @@ subroutine get_qsat(geom,delp,t,q,qsat)
 
   call delp_to_pe_p_logp(geom,delp,pe,pm)
 
-  call qsmith(geom,t,q,pm,qsat)
+  call qsmith(geom,geom%npz,t,q,pm,qsat)
 
   deallocate(pm)
   deallocate(pe)
@@ -374,14 +375,33 @@ end subroutine get_qsat
 
 !----------------------------------------------------------------------------
 
-subroutine qsmith(geom,t,sphum,pl,qs)
+subroutine get_qsat_at_2m(geom,t2m,q2m,ps,qsat2m)
+
+  ! Saturation specific humidity at 2m, from 2m temperature and specific humidity
+  ! and surface pressure
+
+  implicit none
+  type(fv3jedi_geom),   intent(in)  :: geom
+  real(kind=kind_real), intent(in)  ::    t2m(geom%isc:geom%iec,geom%jsc:geom%jec,1)
+  real(kind=kind_real), intent(in)  ::    q2m(geom%isc:geom%iec,geom%jsc:geom%jec,1)
+  real(kind=kind_real), intent(in)  ::     ps(geom%isc:geom%iec,geom%jsc:geom%jec,1)
+  real(kind=kind_real), intent(out) :: qsat2m(geom%isc:geom%iec,geom%jsc:geom%jec,1)
+
+  call qsmith(geom,1,t2m,q2m,ps,qsat2m)
+
+end subroutine get_qsat_at_2m
+
+!----------------------------------------------------------------------------
+
+subroutine qsmith(geom,nlev,t,sphum,pl,qs)
 
   implicit none
   type(fv3jedi_geom), intent(in)  :: geom
-  real(kind_real),    intent(in)  ::     t(geom%isc:geom%iec,geom%jsc:geom%jec,1:geom%npz)
-  real(kind_real),    intent(in)  :: sphum(geom%isc:geom%iec,geom%jsc:geom%jec,1:geom%npz)
-  real(kind_real),    intent(in)  ::    pl(geom%isc:geom%iec,geom%jsc:geom%jec,1:geom%npz)
-  real(kind_real),    intent(out) ::    qs(geom%isc:geom%iec,geom%jsc:geom%jec,1:geom%npz)
+  integer,            intent(in)  :: nlev
+  real(kind_real),    intent(in)  ::     t(geom%isc:geom%iec,geom%jsc:geom%jec,1:nlev)
+  real(kind_real),    intent(in)  :: sphum(geom%isc:geom%iec,geom%jsc:geom%jec,1:nlev)
+  real(kind_real),    intent(in)  ::    pl(geom%isc:geom%iec,geom%jsc:geom%jec,1:nlev)
+  real(kind_real),    intent(out) ::    qs(geom%isc:geom%iec,geom%jsc:geom%jec,1:nlev)
 
   real(kind_real), parameter :: esl = 0.621971831
   real(kind_real), allocatable :: table(:), des(:)
@@ -406,7 +426,7 @@ subroutine qsmith(geom,t,sphum,pl,qs)
   enddo
   des(length) = des(length-1)
 
-  do k=1,geom%npz
+  do k=1,nlev
     do j = geom%jsc,geom%jec
       do i = geom%isc,geom%iec
         ap1 = 10.0_kind_real*dim(t(i,j,k), tice-160.0_kind_real) + 1.0_kind_real
