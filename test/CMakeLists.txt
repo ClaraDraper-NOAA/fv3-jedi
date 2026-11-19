@@ -145,6 +145,7 @@ list( APPEND fv3jedi_testinput
   testinput/convertstate_geos_crtm_surface.yaml
   testinput/convertstate_geos_fv3jedi_for_model2geovals.yaml
   testinput/convertstate_geos_model2geovals.yaml
+  testinput/convertstate_geos_model2geovals_qsat2m.yaml
   testinput/convertstate_geos_vader_for_model2geovals.yaml
   testinput/convertstate_geos.yaml
   testinput/convertstate_gfs_ana2bvars.yaml
@@ -331,6 +332,7 @@ list( APPEND fv3jedi_testoutput
   testoutput/convertincrement_geos_model2geovals.ref
   testoutput/convertstate_geos_crtm_surface.ref
   testoutput/convertstate_geos_model2geovals.ref
+  testoutput/convertstate_geos_model2geovals_qsat2m.ref
   testoutput/convertstate_geos_vader_for_model2geovals.ref
   testoutput/convertstate_geos_fv3jedi_for_model2geovals.ref
   testoutput/convertstate_geos.ref
@@ -914,6 +916,11 @@ ecbuild_add_test( TARGET   fv3jedi_convertstate_gfs_ana2bvars
 ecbuild_add_test( TARGET   fv3jedi_convertstate_geos_model2geovals
                   MPI      6
                   ARGS     testinput/convertstate_geos_model2geovals.yaml
+                  COMMAND  fv3jedi_convertstate.x )
+
+ecbuild_add_test( TARGET   fv3jedi_convertstate_geos_model2geovals_qsat2m
+                  MPI      6
+                  ARGS     testinput/convertstate_geos_model2geovals_qsat2m.yaml
                   COMMAND  fv3jedi_convertstate.x )
 
 ecbuild_add_test( TARGET   fv3jedi_convertstate_geos_vader_for_model2geovals

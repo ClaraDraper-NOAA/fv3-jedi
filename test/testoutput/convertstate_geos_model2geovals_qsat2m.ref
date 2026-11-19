@@ -1,0 +1,41 @@
+Input state: 
+----------------------------------------------------------------------------------------------------
+State print | number of fields = 3 | cube sphere face size: C12
+air_pressure_at_surface                      | Min:+5.3775458927445892e+04 Max:+1.0491548534484887e+05 RMS:+9.8974274781970133e+04
+air_temperature_at_2m                        | Min:+2.2610392580881532e+02 Max:+3.0870787055848893e+02 RMS:+2.8682898951704419e+02
+water_vapor_mixing_ratio_wrt_moist_air_at_2m | Min:+1.4894930349753876e-04 Max:+2.6363857488102910e-01 RMS:+3.3319000417879420e-02
+----------------------------------------------------------------------------------------------------
+Variable transform: fv3jedi::VarChaModel2GeoVaLs variable change
+Variable change from: 3 variables: air_pressure_at_surface, air_temperature_at_2m, water_vapor_mixing_ratio_wrt_moist_air_at_2m
+Variable change to: 1 variables: saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m
+State after variable transform: 
+----------------------------------------------------------------------------------------------------
+State print | number of fields = 1 | cube sphere face size: C12
+saturation_water_vapor_mixing_ratio_wrt_mois | Min:+5.7798155991865981e-05 Max:+3.7816125265049266e-02 RMS:+1.5410544194762505e-02
+----------------------------------------------------------------------------------------------------
+Output state: 
+----------------------------------------------------------------------------------------------------
+State print | number of fields = 1 | cube sphere face size: C12
+saturation_water_vapor_mixing_ratio_wrt_mois | Min:+5.7798155991865981e-05 Max:+3.7816125265049266e-02 RMS:+1.5410544194762505e-02
+----------------------------------------------------------------------------------------------------
+Input state: 
+----------------------------------------------------------------------------------------------------
+State print | number of fields = 4 | cube sphere face size: C12
+air_pressure_at_surface                      | Min:+5.3775458927445892e+04 Max:+1.0491548534484887e+05 RMS:+9.8974274781970133e+04
+air_temperature_at_2m                        | Min:+2.2610392580881532e+02 Max:+3.0870787055848893e+02 RMS:+2.8682898951704419e+02
+saturation_water_vapor_mixing_ratio_wrt_mois | Min:+8.9534132791412090e-05 Max:+2.5450888925952747e-01 RMS:+3.3456771381217679e-02
+water_vapor_mixing_ratio_wrt_moist_air_at_2m | Min:+1.4894930349753876e-04 Max:+2.6363857488102910e-01 RMS:+3.3319000417879420e-02
+----------------------------------------------------------------------------------------------------
+Variable transform: fv3jedi::VarChaModel2GeoVaLs variable change
+Variable change from: 4 variables: air_pressure_at_surface, air_temperature_at_2m, saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m, water_vapor_mixing_ratio_wrt_moist_air_at_2m
+Variable change to: 1 variables: saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m
+State after variable transform: 
+----------------------------------------------------------------------------------------------------
+State print | number of fields = 1 | cube sphere face size: C12
+saturation_water_vapor_mixing_ratio_wrt_mois | Min:+8.9534132791412090e-05 Max:+2.5450888925952747e-01 RMS:+3.3456771381217679e-02
+----------------------------------------------------------------------------------------------------
+Output state: 
+----------------------------------------------------------------------------------------------------
+State print | number of fields = 1 | cube sphere face size: C12
+saturation_water_vapor_mixing_ratio_wrt_mois | Min:+8.9534132791412090e-05 Max:+2.5450888925952747e-01 RMS:+3.3456771381217679e-02
+----------------------------------------------------------------------------------------------------

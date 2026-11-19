@@ -1,0 +1,83 @@
+# Regression test for the 2m saturation specific humidity GeoVaL
+# (saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m) in Model2GeoVaLs.
+#
+# The GEOS C12 test background has no 2m temperature or humidity, so existing
+# 2D fields are used as stand-ins:
+#   air_temperature_at_2m                         <- ts (skin temperature)
+#   water_vapor_mixing_ratio_wrt_moist_air_at_2m  <- cq (exchange coefficient for moisture)
+#   saturation_..._at_2m (state 2 only)           <- cm (exchange coefficient for momentum)
+# The values are not physical 2m fields; the test pins the numerical result.
+#
+# State 1: qsat2m is not in the input, so it is computed from t2m, q2m and
+#          surface pressure.
+# State 2: qsat2m is also in the input, so it must be passed through unchanged
+#          (output norms equal those of cm, not those of state 1).
+input geometry:
+  fms initialization:
+    namelist filename: Data/fv3files/fmsmpp.nml
+    field table filename: Data/fv3files/field_table_gfdl
+  akbk: Data/inputs/fv3files/akbk72.nc4
+  npx: 13
+  npy: 13
+  npz: 72
+output geometry:
+  akbk: Data/inputs/fv3files/akbk72.nc4
+  npx: 13
+  npy: 13
+  npz: 72
+variable change:
+  variable change name: Model2GeoVaLs
+  output variables:
+  - saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m
+  run vader: false
+states:
+# State 1: compute qsat2m from t2m, q2m and surface pressure
+- input:
+    datetime: 2020-12-14T21:00:00Z
+    state variables:
+    - air_pressure_at_surface
+    - air_temperature_at_2m
+    - water_vapor_mixing_ratio_wrt_moist_air_at_2m
+    filetype: cube sphere history
+    provider: geos
+    datapath: Data/inputs/geos_c12
+    filenames:
+    - geos.bkg.20201214_210000z.nc4
+    field io names:
+      air_pressure_at_surface: ps
+      air_temperature_at_2m: ts
+      water_vapor_mixing_ratio_wrt_moist_air_at_2m: cq
+  output:
+    filetype: cube sphere history
+    provider: geos
+    datapath: Data/
+    filename: geovals_qsat2m_computed.geos.%yyyy%mm%dd_%hh%MM%ssz.nc4
+    field io names: &output_io_names
+      saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m: qsat2m
+# State 2: qsat2m already present in the input, so it is preserved
+- input:
+    datetime: 2020-12-14T21:00:00Z
+    state variables:
+    - air_pressure_at_surface
+    - air_temperature_at_2m
+    - water_vapor_mixing_ratio_wrt_moist_air_at_2m
+    - saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m
+    filetype: cube sphere history
+    provider: geos
+    datapath: Data/inputs/geos_c12
+    filenames:
+    - geos.bkg.20201214_210000z.nc4
+    field io names:
+      air_pressure_at_surface: ps
+      air_temperature_at_2m: ts
+      water_vapor_mixing_ratio_wrt_moist_air_at_2m: cq
+      saturation_water_vapor_mixing_ratio_wrt_moist_air_at_2m: cm
+  output:
+    filetype: cube sphere history
+    provider: geos
+    datapath: Data/
+    filename: geovals_qsat2m_preserved.geos.%yyyy%mm%dd_%hh%MM%ssz.nc4
+    field io names: *output_io_names
+test:
+  reference filename: testoutput/convertstate_geos_model2geovals_qsat2m.ref
+  test output filename: testoutput/convertstate_geos_model2geovals_qsat2m.test.out
